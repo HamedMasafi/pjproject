@@ -29,8 +29,9 @@ jobs:
 
       - name: Build pjsip for Android
         run: |
+          echo -e "#define PJ_CONFIG_ANDROID 1\n#include <pj/config_site_sample.h>" >> pjlib/include/pj/config_site.h
           export ANDROID_NDK_ROOT=$ANDROID_NDK_HOME
-          ./configure-android --use-ndk-cmake --ndk-home=$ANDROID_NDK_HOME
+          ./configure-android
           make
 
       - name: Create Android release zip
