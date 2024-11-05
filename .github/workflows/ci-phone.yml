@@ -21,10 +21,12 @@ jobs:
           java-version: '11'
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v2
+        uses: android-actions/setup-android@v4
         with:
+          java-version: '17'
           api-level: 30
           ndk: 21.4.7075529
+          distribution: 'temurin'
 
       - name: Build pjsip for Android
         run: |
