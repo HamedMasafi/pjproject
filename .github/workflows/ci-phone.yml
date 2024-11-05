@@ -16,17 +16,16 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up JDK
-        uses: actions/setup-java@v2
-        with:
-          java-version: '11'
-
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v4
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
           api-level: 30
           ndk: 21.4.7075529
-          distribution: 'temurin'
 
       - name: Build pjsip for Android
         run: |
