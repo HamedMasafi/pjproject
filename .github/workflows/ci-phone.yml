@@ -1,0 +1,94 @@
+name: CI Phones
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  android-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v2
+        with:
+          api-level: 30
+          ndk: 21.4.7075529
+
+      - name: Build pjsip for Android
+        run: |
+          export ANDROID_NDK_ROOT=$ANDROID_NDK_HOME
+          ./configure-android --use-ndk-cmake --ndk-home=$ANDROID_NDK_HOME
+          make
+
+      - name: Create Android release zip
+        run: |
+          mkdir -p release/android
+          cp -r <path_to_compiled_libraries> release/android/
+          cp -r <path_to_headers> release/android/
+          cd release
+          zip -r android-pjsip.zip android
+
+  ios-build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build pjsip for iOS
+        run: |
+          ./configure-ios --with-openssl
+          make -j8
+
+      - name: Create iOS release zip
+        run: |
+          mkdir -p release/ios
+          cp -r <path_to_compiled_libraries> release/ios/
+          cp -r <path_to_headers> release/ios/
+          cd release
+          zip -r ios-pjsip.zip ios
+
+  upload-release:
+    runs-on: ubuntu-latest
+    needs: [android-build, ios-build]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v1.0.0  # Update with your versioning scheme
+          release_name: Release v1.0.0  # Update as needed
+          body: |
+            This release includes the compiled pjsip libraries and headers for Android and iOS.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Android libraries
+        uses: softprops/action-gh-release@v1
+        with:
+          upload_artifact: android-pjsip.zip
+          tag_name: v1.0.0  # Use the same version/tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload iOS libraries
+        uses: softprops/action-gh-release@v1
+        with:
+          upload_artifact: ios-pjsip.zip
+          tag_name: v1.0.0  # Use the same version/tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
