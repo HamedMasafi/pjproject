@@ -1,4 +1,4 @@
-name: CI Phones
+name: CI IOS
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
       - name: Create iOS release zip
         run: |
           mkdir -p release/ios
-          cp -r lib/*.a release/ios/
+          cp -r build/lib/*.a release/ios/
           cp */include release/ios -r
           cd release
           zip -r ios-pjsip.zip ios

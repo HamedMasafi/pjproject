@@ -1,4 +1,4 @@
-name: CI Phones
+name: CI Android
 
 on:
   push:
@@ -37,7 +37,7 @@ jobs:
       - name: Create Android release zip
         run: |
           mkdir -p release/android
-          cp -r lib/*.a release/android/
+          cp -r build/lib/*.a release/android/
           cp */include release/android -r
           cd release
           zip -r android-pjsip.zip android
