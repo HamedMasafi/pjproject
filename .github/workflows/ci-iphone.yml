@@ -24,7 +24,7 @@ jobs:
       - name: Create iOS release zip
         run: |
           mkdir -p release/ios
-          cp -r build/lib/*.a release/ios/
+          find . -type f -name "*.a" -exec cp {} release/android/ \;
           cp */include release/ios -r
           cd release
           zip -r ios-pjsip.zip ios
