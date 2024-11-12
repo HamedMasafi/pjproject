@@ -25,7 +25,7 @@ jobs:
         run: |
           mkdir -p release/ios
           find . -type f -name "*.a" -exec cp {} release/ios/ \;
-          cp */include release/ios -r
+          cp -r */include release/ios
           cd release
           zip -r ios-pjsip.zip ios
 
