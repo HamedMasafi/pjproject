@@ -50,7 +50,8 @@ jobs:
 
       - name: Build pjsip for iOS
         run: |
-          ./configure-ios --with-openssl
+          echo -e "#define PJ_CONFIG_IPHONE 1\n#include <pj/config_site_sample.h>" >> pjlib/include/pj/config_site.h
+          ./configure-iphone --with-openssl
           make -j8
 
       - name: Create iOS release zip
