@@ -1,0 +1,39 @@
+name: CI Phones
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  ios-build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build pjsip for iOS
+        run: |
+          echo -e "#define PJ_CONFIG_IPHONE 1\n#include <pj/config_site_sample.h>" >> pjlib/include/pj/config_site.h
+          ./configure-iphone --with-openssl
+          make -j8
+
+      - name: Create iOS release zip
+        run: |
+          mkdir -p release/ios
+          cp -r lib/*.a release/ios/
+          cp */include release/ios -r
+          cd release
+          zip -r ios-pjsip.zip ios
+
+      - name: Upload package
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: "release/ios-pjsip.zip"
+          asset_name: ios-pjsip-build.zip
+          tag: output-${{ github.ref }}
+          overwrite: true
